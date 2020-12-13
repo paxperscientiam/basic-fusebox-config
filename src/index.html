@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Document</title>
+        $css
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.5/jquery.inputmask.min.js" integrity="sha512-sR3EKGp4SG8zs7B0MEUxDeq8rw9wsuGVYNfbbO/GLCJ59LBE4baEfQBVsP2Y/h2n8M19YV1mujFANO1yA3ko7Q==" crossorigin="anonymous"></script>
+    </head>
+    <body id="body">
+        <form name="new-user-form">
+            <h1>Create new user</h1>
+            <input placeholder='firstname' name="firstname"/>
+            <input placeholder='lastname' name="lastname"/>
+            <input placeholder='age' name="age" type="text" value=""/>
+            <button>submit</button>
+        </form>
+
+        <div id="output"></div>
+
+        <form name="load-user-form">
+            <h1>Load user</h1>
+            <input type='number' name='user-id'>
+            <input placeholder='firstname' name="firstname"/>
+            <input placeholder='lastname' name="lastname"/>
+            <input placeholder='age' name="age" type="text" value=""/>
+            <button name='fetch'>fetch</button>
+            <button>update</button>
+        </form>
+
+        <div id="output2"></div>
+
+
+
+        $bundles
+
+        <script>
+         function print_r(o) {
+             return JSON.stringify(o,null,'\t').replace(/\n/g,'<br>').replace(/\t/g,'&nbsp;&nbsp;&nbsp;'); 
+         }
+
+         let dude
+         $("[name='new-user-form']").on("submit", function(e) {
+             e.preventDefault();
+             dude = new User()
+             const data = {};
+             $(this).serializeArray().forEach(function(element) {
+                 if (element.value) {
+                     data[element.name] = element.value
+                 }
+             });
+
+             dude.save(data);
+             $("#output").html(print_r(dude.dump()))
+         })
+
+         $("[name='load-user-form']").on("mousedown touchstart", "[name='fetch']", function(e) {
+             const formData = new FormData(e.delegateTarget)
+             $(this).parents("form").find("input:not([name='user-id'])").val("")
+             const id = formData.get("user-id")
+             const dude = new User(id)
+             $("#output2").html(print_r(dude.dump()))
+         });
+
+         $("[name='load-user-form']").on("submit", function(e) {
+             e.preventDefault();
+             const data = {};
+             $(this).serializeArray().forEach(function(element) {
+                 if (element.value) {
+                     data[element.name] = element.value
+                 }
+             });
+             const dude = new User(data['user-id'])
+             dude.save(data)
+             $("[name='fetch']", this).trigger("mousedown")
+         });
+
+        </script>
+
+    </body>
+</html>
